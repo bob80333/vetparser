@@ -84,7 +84,7 @@ public class Main {
 
             // skip first 295 bytes
 
-            System.out.println(reader.skip(295));
+            reader.skip(295);
 
             ArrayList<byte[]> petsData = new ArrayList<>();
 
@@ -134,7 +134,7 @@ public class Main {
 
             // skip first 86 bytes
 
-            System.out.println(reader.skip(86));
+            reader.skip(86);
 
             ArrayList<byte[]> historiesData = new ArrayList<>();
 

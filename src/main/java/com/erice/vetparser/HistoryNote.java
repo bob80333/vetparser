@@ -26,19 +26,12 @@ public class HistoryNote {
 
         historyNote.unknown = data[8] & 0xFF;
 
-
-
         historyNote.id1 = data[9] & 0xFF;
 
         historyNote.id2 = data[10] & 0xFF;
 
         byte[] textData = Arrays.copyOfRange(data, 12, 12 + (data[11] & 0xFF));
         historyNote.text = new String(textData);
-
-        if (historyNote.unknown != 0) {
-            System.out.println("HEY ITS NOT 0!");
-            System.out.println(historyNote.toString());
-        }
 
         return historyNote;
     }
