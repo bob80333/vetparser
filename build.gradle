@@ -13,10 +13,16 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    // https://mvnrepository.com/artifact/net.sourceforge.argparse4j/argparse4j
+    compile group: 'net.sourceforge.argparse4j', name: 'argparse4j', version: '0.8.1'
 }
 
 jar {
     manifest {
         attributes 'Main-Class': 'com.erice.vetparser.Main'
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
