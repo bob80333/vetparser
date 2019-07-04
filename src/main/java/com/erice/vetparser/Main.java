@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) throws IOException, ArgumentParserException {
         ArgumentParser parser = ArgumentParsers.newFor("vetparser").build()
                 .description("Parse vet files into csv");
@@ -31,19 +32,20 @@ public class Main {
 
         Namespace res = parser.parseArgs(args);
 
+        // client
         if (res.get("client") != null) {
             File clientFile = new File((String) res.get("client"));
-            FileReader reader = new FileReader(clientFile);
+            FileInputStream reader = new FileInputStream(clientFile);
 
             // skip first 394 bytes, empty in vss so....
 
             reader.skip(394); // skipping stuff
 
-            ArrayList<char[]> clientsData = new ArrayList<>();
+            ArrayList<byte[]> clientsData = new ArrayList<>();
 
             // read all clients into array
-            while (reader.ready()) {
-                char[] clientData = new char[390]; // clients 390 bytes
+            while (reader.available() > 0) {
+                byte[] clientData = new byte[390]; // clients 390 bytes
                 reader.read(clientData);
                 clientsData.add(clientData);
             }
@@ -53,13 +55,14 @@ public class Main {
             // turn clients into objects, parsing the data
 
             ArrayList<Client> clients = new ArrayList<>();
-            for (char[] client : clientsData) {
+            for (byte[] client : clientsData) {
                 clients.add(Client.parseClient(client));
             }
 
 
             // output file as csv
-            String columns = "id, type, name, address1, address2, zipcode, city, state, phone1, phone2, phone3, comment, status1, status2, status3";
+            String columns = "id|type|name|address1|address2|zipcode|city|state|phone1|phone2|phone3|" +
+                    "comment|status1|status2|status3|gender|lastInOffset";
 
             File createdFile = new File(clientFile.getParent() + "/converted_client.csv");
             createdFile.createNewFile();
@@ -77,6 +80,7 @@ public class Main {
             writer.close();
         }
 
+        // pet
         if (res.get("pet") != null) {
             File petFile = new File((String) res.get("pet"));
             FileInputStream reader = new FileInputStream(petFile);
@@ -106,8 +110,8 @@ public class Main {
 
             // output file as csv
 
-            String columns = "ownerId|petId|name|breed|color|comment|refVet1|refVet2|primaryDoctorId|lastVisit|age|" +
-                    "DOB|firstVisit|weight|sex|active";
+            String columns = "ownerId|petId|name|species|gender|active|breed|color|birthdayOffset|comment|refVet1|" +
+                    "refVet2|primaryDoctorId|firstVisitOffset|lastVisitOffset|weight";
 
             File createdFile = new File(petFile.getParent() + "/converted_pet.csv");
             createdFile.createNewFile();
@@ -127,6 +131,7 @@ public class Main {
 
         }
 
+        // history notes
         if (res.get("history") != null) {
             File petFile = new File((String) res.get("history"));
             FileInputStream reader = new FileInputStream(petFile);
@@ -179,7 +184,7 @@ public class Main {
 
             // output file as csv
 
-            String columns = "chunkId|clientId|petId|date|unknown|id1|id2|text";
+            String columns = "chunkId|clientId|petId|dateOffset|unknown|id1|id2|text";
 
             File createdFile = new File(petFile.getParent() + "/converted_histories_notes.csv");
             createdFile.createNewFile();
@@ -189,6 +194,7 @@ public class Main {
             writer.flush();
 
             for (HistoryNote historyNote : historyNotes) {
+                historyNote.text += "[" + historyNote.id1 + "-" + historyNote.id2 + "]";
                 writer.write(historyNote.toString() + "\n");
                 writer.flush();
             }
@@ -201,4 +207,5 @@ public class Main {
 
 
     }
+
 }

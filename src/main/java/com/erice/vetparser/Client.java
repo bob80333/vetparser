@@ -9,6 +9,11 @@ public class Client {
         Client, RefVet, Other, Hospital
     }
 
+    // these are the only options in the original program
+    enum Gender {
+        He, She, They
+    }
+
     public int id;
     public ClientType type;
     public String name;
@@ -21,15 +26,18 @@ public class Client {
     public String phone2;
     public String phone3;
     public String comment;
+    public Gender gender;
     public String unknown1;
+    public int lastInDays;
+    public String unknown2;
     public String status1;
     public String status2;
     public String status3;
-    public String unknown2;
+    public String unknown3;
 
-    public static Client parseClient(char[] data) {
+    public static Client parseClient(byte[] data) {
         Client client = new Client();
-        client.id = (data[0] + (data[1] << 2));
+        client.id = ((data[0] & 0xFF) + ((data[1] & 0xFF) << 8));
         if (data[2] == 0x0) {
             client.type = ClientType.Client;
         } else if (data[2] == 0x1) {
@@ -41,25 +49,25 @@ public class Client {
         }
 
         // offsets are in excel file
-        char[] nameArr = Arrays.copyOfRange(data, 4, 4 + data[3]);
+        byte[] nameArr = Arrays.copyOfRange(data, 4, 4 + (data[3] & 0xFF));
         client.name = new String(nameArr);
 
-        char[] addr1Arr = Arrays.copyOfRange(data, 30, 30 + data[29]);
+        byte[] addr1Arr = Arrays.copyOfRange(data, 30, 30 + (data[29] & 0xFF));
         client.address1 = new String(addr1Arr);
 
-        char[] addr2Arr = Arrays.copyOfRange(data, 67, 67 + data[66]);
+        byte[] addr2Arr = Arrays.copyOfRange(data, 67, 67 + (data[66] & 0xFF));
         client.address2 = new String(addr2Arr);
 
-        char[] zipcode = Arrays.copyOfRange(data, 104, 109);
+        byte[] zipcode = Arrays.copyOfRange(data, 104, 109);
         client.zipcode = new String(zipcode);
 
-        char[] city = Arrays.copyOfRange(data, 110, 110 + data[109]);
+        byte[] city = Arrays.copyOfRange(data, 110, 110 + (data[109] & 0xFF));
         client.city = new String(city);
 
-        char[] state = Arrays.copyOfRange(data, 126, 128);
+        byte[] state = Arrays.copyOfRange(data, 126, 128);
         client.state = new String(state);
 
-        char[] phone = Arrays.copyOfRange(data, 129, 134);
+        byte[] phone = Arrays.copyOfRange(data, 129, 134);
         String phoneS = new String(phone);
         phone = Arrays.copyOfRange(data, 135, 143);
         phoneS += new String(phone);
@@ -73,13 +81,33 @@ public class Client {
 
         client.phone2 = phoneS;
 
-        char[] comments = Arrays.copyOfRange(data, 159, 159 + data[158]);
+        byte[] comments = Arrays.copyOfRange(data, 159, 159 + (data[158] & 0xFF));
         client.comment = new String(comments);
 
-        char[] unknown = Arrays.copyOfRange(data, 198, 231);
+        byte gender = data[198];
+
+        switch (gender) {
+            case 0x0:
+                client.gender = Gender.He;
+                break;
+            case 0x1:
+                client.gender = Gender.She;
+                break;
+            case 0x2:
+                client.gender = Gender.They;
+                break;
+        }
+
+        byte[] unknown = Arrays.copyOfRange(data, 199, 218);
         client.unknown1 = new String(unknown);
 
-        char[] status = Arrays.copyOfRange(data, 232, 246);
+        byte[] date = Arrays.copyOfRange(data, 219, 221);
+        client.lastInDays = Utils.calculateDays(Utils.convertByteToInt(date));
+
+        unknown = Arrays.copyOfRange(data, 221, 231);
+        client.unknown2 = new String(unknown);
+
+        byte[] status = Arrays.copyOfRange(data, 232, 246);
         client.status1 = new String(status);
 
         status = Arrays.copyOfRange(data, 247, 261);
@@ -89,7 +117,7 @@ public class Client {
         client.status3 = new String(status);
 
         unknown = Arrays.copyOfRange(data, 276, 351);
-        client.unknown2 = new String(unknown);
+        client.unknown3 = new String(unknown);
 
         phone = Arrays.copyOfRange(data, 352, 357);
         phoneS = new String(phone);
@@ -103,8 +131,8 @@ public class Client {
 
     @Override
     public String toString() {
-        return id + "," + type.toString() + "," + name + "," + address1 + "," + address2 + "," + zipcode + "," + city
-                + "," + state + "," + phone1 + "," + phone2 + "," + phone3 + "," + comment + "," + status1 + ","
-                + status2 + "," + status3;
+        return id + "|" + type.toString() + "|" + name + "|" + address1 + "|" + address2 + "|" + zipcode + "|" + city
+                + "|" + state + "|" + phone1 + "|" + phone2 + "|" + phone3 + "|" + comment + "|" + status1 + "|"
+                + status2 + "|" + status3 + "|" + gender + "|" + lastInDays;
     }
 }

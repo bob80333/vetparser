@@ -22,7 +22,8 @@ public class HistoryNote {
 
         historyNote.petNum = ((data[3] & 0xFF) + ((data[4] & 0xFF) << 8));
 
-        historyNote.date = ((data[5] & 0xFF) + ((data[6] & 0xFF) << 8) + ((data[7] & 0xFF) << 16));
+        byte[] dateOffset = Arrays.copyOfRange(data, 5, 7);
+        historyNote.date = Utils.calculateDays(Utils.convertByteToInt(dateOffset));
 
         historyNote.unknown = data[8] & 0xFF;
 
