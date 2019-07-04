@@ -20,13 +20,13 @@ public class Pet {
     public int petId;
     public String name;
     public String breed;
-    public int birthdayOffset;
+    public String birthdayOffset;
     public String color;
     public Species species;
     public Gender gender;
     public String comment;
-    public int firstVisitOffset;
-    public int lastVisitOffset;
+    public String firstVisitOffset;
+    public String lastVisitOffset;
     public String active;
     public String weight; // hex string, somehow both pounds and kilograms are stored in 12 bytes
     public String refVet1;
@@ -73,7 +73,7 @@ public class Pet {
         pet.breed = new String(breedArr);
 
         byte[] bdayOffset = Arrays.copyOfRange(data, 33, 35);
-        pet.birthdayOffset = Utils.calculateDays(Utils.convertByteToInt(bdayOffset));
+        pet.birthdayOffset = Utils.bytesToHex(bdayOffset);
 
 
         byte[] colorArr = Arrays.copyOfRange(data, 36, 36 + (data[35] & 0xFF));
@@ -102,7 +102,7 @@ public class Pet {
         pet.active = data[42] > 0 ? "Yes" : "No";
 
         byte[] firstVisitOffset = Arrays.copyOfRange(data, 60, 62);
-        pet.firstVisitOffset = Utils.calculateDays(Utils.convertByteToInt(firstVisitOffset));
+        pet.firstVisitOffset = Utils.bytesToHex(firstVisitOffset);
 
         byte[] refVet1Arr = Arrays.copyOfRange(data, 66, 66 + (data[65] & 0xFF));
         pet.refVet1 = new String(refVet1Arr);
@@ -117,7 +117,7 @@ public class Pet {
         pet.weight = Utils.bytesToHex(weightData);
 
         byte[] lastVisitOffset = Arrays.copyOfRange(data, 210, 212);
-        pet.lastVisitOffset = Utils.calculateDays(Utils.convertByteToInt(lastVisitOffset));
+        pet.lastVisitOffset = Utils.bytesToHex(lastVisitOffset);
 
 
         return pet;

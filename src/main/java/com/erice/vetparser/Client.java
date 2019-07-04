@@ -28,7 +28,7 @@ public class Client {
     public String comment;
     public Gender gender;
     public String unknown1;
-    public int lastInDays;
+    public String lastInDays;
     public String unknown2;
     public String status1;
     public String status2;
@@ -102,7 +102,7 @@ public class Client {
         client.unknown1 = new String(unknown);
 
         byte[] date = Arrays.copyOfRange(data, 219, 221);
-        client.lastInDays = Utils.calculateDays(Utils.convertByteToInt(date));
+        client.lastInDays = Utils.bytesToHex(date);
 
         unknown = Arrays.copyOfRange(data, 221, 231);
         client.unknown2 = new String(unknown);

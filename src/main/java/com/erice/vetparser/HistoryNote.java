@@ -7,7 +7,7 @@ public class HistoryNote {
     public int chunkNum;
     public int clientNum;
     public int petNum;
-    public int date;
+    public String date;
     public int unknown;
     public int id1;
     public int id2;
@@ -23,7 +23,7 @@ public class HistoryNote {
         historyNote.petNum = ((data[3] & 0xFF) + ((data[4] & 0xFF) << 8));
 
         byte[] dateOffset = Arrays.copyOfRange(data, 5, 7);
-        historyNote.date = Utils.calculateDays(Utils.convertByteToInt(dateOffset));
+        historyNote.date = Utils.bytesToHex(dateOffset);
 
         historyNote.unknown = data[8] & 0xFF;
 
